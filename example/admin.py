@@ -12,9 +12,6 @@ class MyModelAdmin(admin.AdminSite):
         "my_first_field",
         "my_second_field",
     )
-    radio_fields = {
-        "my_first_field": admin.VERTICAL,
-        "my_second_field": admin.VERTICAL}
 
 admin.site.register(MyModel, MyModelAdmin)
 
@@ -27,8 +24,5 @@ class MyOtherModelAdmin(admin.AdminSite):
         "my_first_field",
         "my_second_field",
     )
-    radio_fields = {
-        "my_first_field": admin.VERTICAL,
-        "my_second_field": admin.VERTICAL}
 
 admin.site.register(MyOtherModel, MyOtherModelAdmin)
