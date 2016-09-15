@@ -4,6 +4,7 @@ from django.contrib.admin.sites import AdminSite
 from example.admin import MyModelAdmin
 
 from example.models import MyModel
+from example.forms import MyModelForm
 
 
 class MockRequest(object):
@@ -22,8 +23,11 @@ class TestReadonlyAdminMixin(TestCase):
 
     def test_replace_field_label(self):
         custom_model_admin = MyModelAdmin(MyModel, self.site)
-#         custom_model_admin.replace_labels('my_first_field', )
-        print dir(custom_model_admin), 'custom_model_admin'
+        form = custom_model_admin.get_form(self.request, self.my_model)
+        WIDGET = 1
+        for _, fld in enumerate(form.base_fields.items()):
+            print str(fld[WIDGET].label)
+
 
 
 # from django.db import models

@@ -5,11 +5,11 @@ from datetime import datetime
 from django.utils import timezone
 
 
-class ModifyFormLabelMixin:
+class ModifyFormLabelMixin(object):
     """Replace a from label datetime placeholder with a datetime value."""
 
-    def get_form(self, form, request, obj, **kwargs):
-        form = super(ModifyFormLabelMixin, self).get_form(form, request, obj, **kwargs)
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(ModifyFormLabelMixin, self).get_form(request, obj, **kwargs)
         return self.replace_labels(form, request)
 
     def convert_to_string(self, value):
