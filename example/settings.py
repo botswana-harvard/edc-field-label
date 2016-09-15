@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'edc_field_label',
     'example',
-    'django_extensions',
 ]
 
 MIDDLEWARE = [
