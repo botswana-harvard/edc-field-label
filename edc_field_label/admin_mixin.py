@@ -41,7 +41,11 @@ class ModifyFormLabelMixin(object):
             for _, values in self.replacements.iteritems():
                 if values['field_attr'] == fld[0] and obj:
                     replacement_value_obj = getattr(obj, values['attr'])()
-                    replacement_value = self.convert_to_string(getattr(replacement_value_obj, values['replacement_attr']))
-                    if re.search(r'{}'.format(values['placeholder']), str(fld[WIDGET].label)):
-                        fld[WIDGET].label = re.sub('{}'.format(values['placeholder']), replacement_value, fld[WIDGET].label)
+                    if replacement_value_obj:
+                        replacement_value = self.convert_to_string(
+                            getattr(replacement_value_obj, values['replacement_attr']))
+                        if re.search(r'{}'.format(values['placeholder']), str(fld[WIDGET].label)):
+                            fld[WIDGET].label = re.sub(
+                                '{}'.format(values['placeholder']),
+                                replacement_value, fld[WIDGET].label)
         return form
