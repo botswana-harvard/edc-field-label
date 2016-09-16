@@ -2,15 +2,27 @@ import re
 
 from datetime import datetime
 
-from django.utils import timezone
-
 
 class ModifyFormLabelMixin(object):
     """Replace a from label datetime placeholder with a datetime value."""
+    replacements = {
+        'first_rep': {
+            'field_attr': 'my_first_field',
+            'placeholder': 'last_visit_date',
+            'replacement_attr': 'report_datetime',
+            'attr': 'previous_visit',
+        },
+        'second_rep': {
+            'field_attr': 'my_first_field',
+            'placeholder': 'last_appt_date',
+            'replacement_attr': 'report_datetime',
+            'attr': 'previous_appt',
+        },
+    }
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ModifyFormLabelMixin, self).get_form(request, obj, **kwargs)
-        return self.replace_labels(form, request)
+        return self.replace_labels(form, obj)
 
     def convert_to_string(self, value):
         """Convert a value to string, if its a date make it a string date version"""
@@ -22,12 +34,14 @@ class ModifyFormLabelMixin(object):
             new_value = value
         return new_value
 
-    def replace_labels(self, form, request):
-        # TODO: get the value from the request object.
-        value = timezone.now()  # This value should come from the request object.
+    def replace_labels(self, form, obj):
         WIDGET = 1
+        replacement_value = None
         for _, fld in enumerate(form.base_fields.items()):
-            replacement_value = self.convert_to_string(value)
-            if not re.match(r'^\d+\.', str(fld[WIDGET].label)) and re.search(r'\[.*\]', str(fld[WIDGET].label)):
-                fld[WIDGET].label = re.sub('\[.*\]', '[' + replacement_value + ']', fld[WIDGET].label)
+            for _, values in self.replacements.iteritems():
+                if values['field_attr'] == fld[0] and obj:
+                    replacement_value_obj = getattr(obj, values['attr'])()
+                    replacement_value = self.convert_to_string(getattr(replacement_value_obj, values['replacement_attr']))
+                    if re.search(r'{}'.format(values['placeholder']), str(fld[WIDGET].label)):
+                        fld[WIDGET].label = re.sub('{}'.format(values['placeholder']), replacement_value, fld[WIDGET].label)
         return form

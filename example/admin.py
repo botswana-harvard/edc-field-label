@@ -13,6 +13,10 @@ class MyModelAdmin(ModifyFormLabelMixin, admin.ModelAdmin):
     fields = ['my_other_model', 'my_first_field', 'my_second_field']
     list_display = ('my_first_field', 'my_second_field')
 
+    def change_view(self, request, object_id, extra_context=None):
+        my_context = {'field_placeholder_values': {'my_first_field': 1000000000, 'my_first_field': 1000000000}}
+        return super(MyModelAdmin, self).change_view(request, object_id, extra_context=my_context)
+
 admin.site.register(MyModel, MyModelAdmin)
 
 

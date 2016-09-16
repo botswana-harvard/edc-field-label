@@ -3,8 +3,8 @@ from django.contrib.admin.sites import AdminSite
 
 from example.admin import MyModelAdmin
 
-from example.models import MyModel
-from example.forms import MyModelForm
+from example.models import MyModel, MyOtherModel
+from django.utils import timezone
 
 
 class MockRequest(object):
@@ -15,70 +15,34 @@ class TestReadonlyAdminMixin(TestCase):
 
     def setUp(self):
         self.request = MockRequest()
-        self.my_model = MyModel.objects.create(
+        self.site = AdminSite()
+
+    def test_replace_labels_not_replaced(self):
+        """Test replacing a place holder with a datetime."""
+        custom_model_admin = MyModelAdmin(MyModel, self.site)
+        form = custom_model_admin.get_form(self.request)
+        label = 'We last spoke with you on last_visit_date and scheduled an appointment for you in an HIV care clinic on last_appt_date. Did you keep that appointment?'
+        self.assertEqual(form.base_fields['my_first_field'].label, label)
+
+    def test_replace_labels_replaced(self):
+        """Test replacing a place holder with a datetime."""
+        custom_model_admin = MyModelAdmin(MyModel, self.site)
+        form = custom_model_admin.get_form(self.request)
+        label = 'We last spoke with you on last_visit_date and scheduled an appointment for you in an HIV care clinic on last_appt_date. Did you keep that appointment?'
+        self.assertEqual(form.base_fields['my_first_field'].label, label)
+
+        my_other_model = MyOtherModel.objects.create(
+            my_first_field="this is just test data 1",
+            report_datetime=timezone.now())
+        my_model = MyModel.objects.create(
+            my_other_model=my_other_model,
             my_first_field="this is just test data 1",
             my_second_field="this is just test data 2"
         )
-        self.site = AdminSite()
+        new_value = timezone.datetime(2016, 12, 12, 3, 23)
+        my_other_model.report_datetime = new_value
+        my_other_model.save()
 
-    def test_replace_field_label(self):
-        custom_model_admin = MyModelAdmin(MyModel, self.site)
-        form = custom_model_admin.get_form(self.request, self.my_model)
-        WIDGET = 1
-        for _, fld in enumerate(form.base_fields.items()):
-            print str(fld[WIDGET].label)
-
-
-
-# from django.db import models
-# from django.test import TestCase
-# from django.utils import timezone
-# 
-# from example.forms import MyModelForm
-# 
-# 
-# class TestModel(models.Model):
-# 
-#     field_1 = models.CharField()
-# 
-# 
-# class TestModifyFieldLableMixin(TestCase):
-# 
-#     def setUp(self):
-#         pass
-# 
-#     def test_replace_labels_datetime_Value(self):
-#         """Test replacing a place holder with a datetime."""
-#         form_data = {"my_first_field": "test value 1", "my_second_field": "test value 1"}
-#         new_value = timezone.datetime(2016, 12, 12, 3, 23)
-#         form = MyModelForm(data=form_data)
-#         self.assertTrue(form.is_valid())
-#         label = 'This text was last modified on []'
-#         new_label = 'This text was last modified on [Monday, December 12, 2016 at 03:23 hours]'
-#         self.assertEqual(form.base_fields['my_first_field'].label, label)
-#         form.replace_labels('my_first_field', new_value)
-#         self.assertEqual(form.base_fields['my_first_field'].label, new_label)
-# 
-#     def test_replace_labels_non_datetime_Value(self):
-#         """Test replacing a place holder with a value."""
-#         form_data = {"my_second_field": "test value 1", "my_second_field": "test value 1"}
-#         new_value = "last month"
-#         form = MyModelForm(data=form_data)
-#         self.assertTrue(form.is_valid())
-#         new_label = 'The second field text was last modified on [last month] before the first text was modified.'
-#         form.replace_labels('my_second_field', new_value)
-#         self.assertEqual(form.base_fields['my_second_field'].label, new_label)
-# 
-#     def test_replace_labels_again(self):
-#         """Test replacing a place lable that has been replaced with a value before."""
-#         form_data = {"my_second_field": "test value 1", "my_second_field": "test value 1"}
-#         new_value = "last month"
-#         form = MyModelForm(data=form_data)
-#         self.assertTrue(form.is_valid())
-#         new_label = 'The second field text was last modified on [last month] before the first text was modified.'
-#         form.replace_labels('my_second_field', new_value)
-#         self.assertEqual(form.base_fields['my_second_field'].label, new_label)
-#         another_new_value = timezone.datetime(2016, 12, 12, 3, 23)
-#         form.replace_labels('my_second_field', another_new_value)
-#         another_new_label = 'The second field text was last modified on [Monday, December 12, 2016 at 03:23 hours] before the first text was modified.'
-#         self.assertEqual(form.base_fields['my_second_field'].label, another_new_label)
+        new_label = 'We last spoke with you on Monday, December 12, 2016 at 03:23 hours and scheduled an appointment for you in an HIV care clinic on Monday, December 12, 2016 at 03:23 hours. Did you keep that appointment?'
+        form = custom_model_admin.get_form(self.request, my_model)
+        self.assertEqual(form.base_fields['my_first_field'].label, new_label)

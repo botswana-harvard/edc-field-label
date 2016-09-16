@@ -31,7 +31,8 @@ class MyModel (models.Model):
     my_other_model = models.ForeignKey(MyOtherModel, null=True)
 
     my_first_field = models.CharField(
-        verbose_name='This text was last modified     on []',
+        verbose_name="We last spoke with you on last_visit_date and scheduled an appointment for you "
+                     "in an HIV care clinic on last_appt_date. Did you keep that appointment?",
         default=None,
         null=True,
         blank=True,
@@ -47,6 +48,12 @@ class MyModel (models.Model):
         max_length=50,
         help_text=""
     )
+
+    def previous_visit(self):
+        return self.my_other_model
+
+    def previous_appt(self):
+        return self.my_other_model
 
     class Meta:
         app_label = 'example'
