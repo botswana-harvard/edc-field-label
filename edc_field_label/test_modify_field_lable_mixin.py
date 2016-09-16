@@ -38,14 +38,14 @@ class TestReadonlyAdminMixin(TestCase):
         self.site = AdminSite()
 
     def test_replace_labels_not_replaced(self):
-        """Test replacing a place holder with a datetime."""
+        """Test if the original field label return with place holder"""
         custom_model_admin = MyModelAdmin(MyModel, self.site)
         form = custom_model_admin.get_form(self.request)
         label = 'We last spoke with you on last_visit_date and scheduled an appointment for you in an HIV care clinic on last_appt_date. Did you keep that appointment?'
         self.assertEqual(form.base_fields['my_first_field'].label, label)
 
     def test_replace_labels(self):
-        """Test replacing a place holder with a datetime."""
+        """Test replacing a place holder with a value on a label."""
         custom_model_admin = MyModelAdmin(MyModel, self.site)
         form = custom_model_admin.get_form(self.request)
         label = 'We last spoke with you on last_visit_date and scheduled an appointment for you in an HIV care clinic on last_appt_date. Did you keep that appointment?'
@@ -68,7 +68,7 @@ class TestReadonlyAdminMixin(TestCase):
         self.assertEqual(form.base_fields['my_first_field'].label, new_label)
 
     def test_replace_more_labels(self):
-        """Test replacing a place holder with a datetime."""
+        """Test replacing a place holder on more than one field."""
         custom_model_admin = MyModelAdmin(MyModel, self.site)
         custom_model_admin.replacements = self.replacements
         form = custom_model_admin.get_form(self.request)
