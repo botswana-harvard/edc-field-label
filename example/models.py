@@ -3,7 +3,26 @@ from datetime import datetime
 from django.db import models
 
 
+class MyLocationModel (models.Model):
+
+    community = models.CharField(
+        verbose_name='Community name',
+        default=None,
+        null=True,
+        blank=True,
+        max_length=50,
+        help_text=""
+    )
+
+    class Meta:
+        app_label = 'example'
+        verbose_name = "My Location Model"
+        verbose_name_plural = "My Location Model"
+
+
 class MyOtherModel (models.Model):
+
+    my_location_model = models.ForeignKey(MyLocationModel, null=True)
 
     my_first_field = models.CharField(
         verbose_name='This is just a test field.',
@@ -41,7 +60,7 @@ class MyModel (models.Model):
     )
 
     my_second_field = models.CharField(
-        verbose_name='The second field text was last modified on [] before the first text was modified.',
+        verbose_name='Since we last saw you at last_seen_location, did you play soccer?',
         default=None,
         null=True,
         blank=True,
@@ -54,6 +73,9 @@ class MyModel (models.Model):
 
     def previous_appt(self):
         return self.my_other_model
+
+    def previous_location(self):
+        return self.my_other_model.my_location_model
 
     class Meta:
         app_label = 'example'
