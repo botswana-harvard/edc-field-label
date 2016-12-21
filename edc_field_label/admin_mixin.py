@@ -38,7 +38,7 @@ class ModifyFormLabelMixin(object):
         WIDGET = 1
         replacement_value = None
         for _, fld in enumerate(form.base_fields.items()):
-            for _, values in self.replacements.iteritems():
+            for _, values in self.replacements.items():
                 if values['field_attr'] == fld[0] and obj:
                     replacement_value_obj = getattr(obj, values['attr'])()
                     if replacement_value_obj:
