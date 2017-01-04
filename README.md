@@ -11,7 +11,7 @@ add to settings.py:
 
 INSTALLED_APPS = [
 ....
-'edc_field_lable',
+'edc_field_lable.apps.AppConfig',
 ...]
 
 ###Usage
@@ -30,19 +30,17 @@ Defination of the custom model admin. Define the 'replacements' config dictionar
 	class MyModelAdmin (ModifyFormLabelMixin, admin.ModelAdmin):
 
 		replacements = {
-	        'first_rep': {
-	            'field_attr': 'my_first_field',
-	            'placeholder': 'last_visit_date',
-	            'replacement_attr': 'report_datetime',
-	            'attr': 'previous_visit',
-	        },
-	        'second_rep': {
-	            'field_attr': 'my_first_field',
-	            'placeholder': 'last_appt_date',
-	            'replacement_attr': 'report_datetime',
-	            'attr': 'previous_appt',
-	        },
-	    }
+            'first_rep': {
+                'field_attr': 'my_first_field',
+                'place_holder': 'last_visit_date',
+                'place_holder_value': value,
+            },
+            'second_rep': {
+                'field_attr': 'my_first_field',
+                'place_holder': 'last_appt_date',
+                'place_holder_value': value,
+            },
+        }
 		
         form = MyModelForm
 
@@ -51,29 +49,6 @@ Defination of the custom model admin. Define the 'replacements' config dictionar
 	admin.site.register(MyModel, MyModelAdmin)
 
 The models look like this
-
-	class MyOtherModel (models.Model):
-	
-	    my_first_field = models.CharField(
-	        verbose_name='This is just a test field.',
-	        default=None,
-	        null=True,
-	        blank=True,
-	        max_length=50,
-	        help_text=""
-	    )
-	
-	    report_datetime = models.DateTimeField(
-	        verbose_name="Report Date",
-	        default=datetime.now,
-	        help_text=('If reporting today, use today\'s date/time, otherwise use '
-	                   'the date/time this information was reported.'))
-	
-	    class Meta:
-	        app_label = 'example'
-	        verbose_name = "My Other Model"
-	        verbose_name_plural = "My Other Model"
-
 
 	class MyModel (models.Model):
 	
@@ -97,12 +72,6 @@ The models look like this
 	        max_length=50,
 	        help_text=""
 	    )
-	
-	    def previous_visit(self):
-	        return self.my_other_model
-	
-	    def previous_appt(self):
-	        return self.my_other_model
 	
 	    class Meta:
 	        app_label = 'example'
