@@ -1,27 +1,18 @@
 from django.contrib import admin
 
 from edc_field_label.admin_mixin import ModifyFormLabelMixin
-from .models import MyModel, MyOtherModel, MyLocationModel
+from .models import MyModel, MyLocationModel
 
-from .forms import MyModelForm, MyOtherModelForm, MyLocationModelForm
+from .forms import MyModelForm, MyLocationModelForm
 
 
 class MyModelAdmin(ModifyFormLabelMixin, admin.ModelAdmin):
 
     form = MyModelForm
 
-    fields = ['my_other_model', 'my_first_field', 'my_second_field']
+    fields = ['my_first_field', 'my_second_field']
 
 admin.site.register(MyModel, MyModelAdmin)
-
-
-class MyOtherModelAdmin(admin.ModelAdmin):
-
-    form = MyOtherModelForm
-
-    fields = ['my_first_field', 'report_datetime']
-
-admin.site.register(MyOtherModel, MyOtherModelAdmin)
 
 
 class MyLocationModelAdmin(admin.ModelAdmin):

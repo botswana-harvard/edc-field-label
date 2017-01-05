@@ -23,36 +23,23 @@ the question on the form field or or a description of what should be field on th
 This app provides a way to modify the field label on opening the form, but substituting a place holder with a value
 provided for a specified field.
 
-First use the admin mixin that bring in the method that modifies a label. The replacement value can be a datetime or any other type.
+First use the admin_mixin that bring in the method that modifies a label. The label replacement value can be a datetime or any other type.
 
-Defination of the custom model admin. Define the 'replacements' config dictionary in you model admin.
+Step 1.
+
+Defination of the custom model admin.
 
 	class MyModelAdmin (ModifyFormLabelMixin, admin.ModelAdmin):
 
-		replacements = {
-            'first_rep': {
-                'field_attr': 'my_first_field',
-                'place_holder': 'last_visit_date',
-                'place_holder_value': value,
-            },
-            'second_rep': {
-                'field_attr': 'my_first_field',
-                'place_holder': 'last_appt_date',
-                'place_holder_value': value,
-            },
-        }
-		
         form = MyModelForm
 
-    	fields = ['my_other_model', 'my_first_field', 'my_second_field']
+    	fields = ['my_first_field', 'my_second_field']
 
 	admin.site.register(MyModel, MyModelAdmin)
 
 The models look like this
 
 	class MyModel (models.Model):
-	
-	    my_other_model = models.ForeignKey(MyOtherModel, null=True)
 	
 	    my_first_field = models.CharField(
 	        verbose_name="We last spoke with you on last_visit_date and scheduled an appointment for you "
@@ -78,4 +65,38 @@ The models look like this
 	        verbose_name = "My Model"
 	        verbose_name_plural = "My Model"
  
+Step 2.
+
+ In your views do the following in the get_context_data:
+ 
+ 		def get_context_data(self, **kwargs):
+	        context = super(HomeView, self).get_context_data(**kwargs)
+	        label_replacements = {
+	            'first_rep': {
+	                'field_attr': 'my_first_field',
+	                'place_holder': 'last_visit_date',
+	                'place_holder_value': timezone.datetime(1986, 7, 7, 13, 14),
+	            },
+	            'second_rep': {
+	                'field_attr': 'my_first_field',
+	                'place_holder': 'last_appt_date',
+	                'place_holder_value': timezone.datetime(1986, 7, 7, 13, 14),
+	            },
+	        }
+	        context.update(
+	            label_replacements=json.dumps(label_replacements, cls=DatetimeEncoder),
+	        )
+	        return context
+Step 3.
+
+ In the template do the following:
+  	
+  		This is for an add url:
+  		
+  		<a href="{% url 'admin:example_mymodel_add' %}?label_replacements={{label_replacements}}">Add MyModel</a>
+  
+  		This is for a change url:
+  		
+  		<a href="{% url 'admin:example_mymodel_change' obj.pk %}?label_replacements={{label_replacements}}">Modify MyModel</a>
+  		
  
